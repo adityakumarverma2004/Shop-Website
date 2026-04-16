@@ -1,0 +1,29 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}About Us | Seth Sanwara Jewellers{% endblock %}
+
+{% block content %}
+<div class="container section-padding" style="margin-top: 60px;">
+    <div class="about-card">
+        <div class="about-img">
+            <img src="https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                alt="Craftsmanship">
+        </div>
+        <div class="about-text">
+            <h2>A Legacy of Purity</h2>
+            <p>Welcome to <strong>Seth Sanwara Jewellers</strong>, a beacon of purity, trust, and exceptional
+                craftsmanship located in the heart of Singrauli, Madhya Pradesh.</p>
+            <p>Our journey began with a simple philosophy: to offer jewelry that isn't just an ornament, but a
+                celebrated heirloom. We believe that every piece of jewelry carries an emotion, a memory, and a promise.
+                From traditional masterpieces that echo India's rich heritage to contemporary minimalist designs, our
+                collections cater to diverse tastes and occasions.</p>
+            <p>Driven by rigorous quality control and hallmarked authenticity, we ensure that what you wear is
+                immaculate. Our master artisans pour their hearts into every design, making sure you shine the brightest
+                on your special days.</p>
+            <div style="margin-top: 2rem;">
+                <a href="{% url 'gallery' %}" class="btn btn-primary">Discover Our Craft</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

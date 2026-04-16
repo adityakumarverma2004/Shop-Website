@@ -1,0 +1,178 @@
+{% extends 'layouts/base.html' %}
+{% load currency_tags %}
+{% load static %}
+
+{% block title %}{{ product.title }} | Seth Sanwara Jewellers{% endblock %}
+
+{% block extra_head %}
+<meta property="og:title" content="{{ product.title }} - Seth Sanwara Jewellers">
+<meta property="og:description" content="{{ product.description|truncatewords:20 }}">
+{% if product.images.first %}
+<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ product.images.first.image.url }}">
+{% endif %}
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
+<meta property="og:type" content="product">
+{% endblock %}
+
+{% block content %}
+<div class="container section-padding" style="margin-top: 60px;">
+
+    <div class="product-detail-wrapper">
+        <!-- Left Side: Image Gallery -->
+        <div class="product-gallery-section">
+            <div class="main-image-display">
+                {% if product.images.all %}
+                <div class="detail-slider-container" style="overflow: hidden; cursor: zoom-in;">
+                    {% for img in product.images.all %}
+                    <img src="{{ img.image.url }}" alt="{{ product.title }}"
+                        class="detail-slider-image {% if forloop.first %}active{% endif %}"
+                        style="transition: transform 0.3s ease; transform-origin: center; width: 100%; height: 100%; object-fit: cover;"
+                        id="main-product-img-{{ forloop.counter0 }}">
+                    {% endfor %}
+                </div>
+                {% else %}
+                <img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+                    alt="Placeholder">
+                {% endif %}
+            </div>
+
+            <!-- Thumbnail Strip -->
+            {% if product.images.count > 1 %}
+            <div class="thumbnail-strip">
+                {% for img in product.images.all %}
+                <div class="thumbnail-btn {% if forloop.first %}active{% endif %}" data-target="{{ forloop.counter0 }}">
+                    <img src="{{ img.image.url }}" alt="Thumbnail">
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Right Side: Details -->
+        <div class="product-info-section">
+            <h1 class="detail-title">{{ product.title }}</h1>
+            <p class="detail-category">{{ product.category.name }}</p>
+
+            <div class="product-attributes" style="margin-bottom: 1rem;">
+                {% if product.carat %}
+                <span class="badge badge-gold"
+                    style="background: rgba(212, 175, 55, 0.15); color: #b08d20; padding: 6px 12px; border-radius: 4px; font-size: 1rem; font-weight: bold; margin-right: 10px;">
+                    <i class="fas fa-gem"></i> {{ product.carat }}
+                </span>
+                {% endif %}
+                {% if product.weight_grams %}
+                <span class="badge badge-weight"
+                    style="background: #f0f0f0; color: #555; padding: 6px 12px; border-radius: 4px; font-size: 1rem; font-weight: bold;">
+                    <i class="fas fa-balance-scale"></i> {{ product.weight_grams }}g
+                </span>
+                {% endif %}
+            </div>
+
+            <div class="detail-price" style="margin-bottom: 1rem; padding-bottom: 1rem;">
+                ₹{{ product.price|indian_rupee }}
+            </div>
+
+            <div class="detail-description">
+                <h3>About this Piece</h3>
+                <p>{{ product.description|linebreaks }}</p>
+            </div>
+
+            <div class="detail-features">
+                <div class="feature-item">
+                    <i class="fas fa-check-circle"></i> 100% Certified Authentic
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-undo"></i> Easy Returns Policy
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-shield-alt"></i> Lifetime Maintenance
+                </div>
+            </div>
+
+            <div class="detail-actions">
+                <a href="https://wa.me/918871013023?text=Hello%20Seth%20Sanwara%20Jewellers,%20I%20am%20interested%20in%20purchasing%20the%20*{{ product.title }}*%20listed%20at%20₹{{ product.price|indian_rupee }}.%0A%0AHere%20is%20the%20link%20to%20the%20product:%20{{ request.build_absolute_uri }}"
+                    target="_blank" class="btn btn-primary btn-block detail-btn" style="text-align: center;">
+                    <i class="fab fa-whatsapp"></i> Buy via WhatsApp
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Products -->
+    {% if related_products %}
+    <div class="related-products-section">
+        <h2 class="section-title">You Might Also Like</h2>
+        <div class="product-grid" style="margin-top: 2rem;">
+            {% for rel_product in related_products %}
+            <div class="product-card">
+                <div class="product-img-wrap">
+                    <a href="{% url 'product_detail' rel_product.id %}">
+                        {% if rel_product.images.all %}
+                        <img src="{{ rel_product.images.first.image.url }}" alt="{{ rel_product.title }}"
+                            style="width: 100%; height: 100%; object-fit: cover;">
+                        {% else %}
+                        <img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+                            alt="Placeholder" style="width: 100%; height: 100%; object-fit: cover;">
+                        {% endif %}
+                    </a>
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title"><a href="{% url 'product_detail' rel_product.id %}"
+                            style="color: inherit; text-decoration: none;">{{ rel_product.title }}</a></h3>
+                    <p class="product-price">₹{{ rel_product.price|indian_rupee }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const thumbnails = document.querySelectorAll('.thumbnail-btn');
+        const mainImages = document.querySelectorAll('.detail-slider-image');
+
+        if (thumbnails.length > 0) {
+            thumbnails.forEach(thumb => {
+                thumb.addEventListener('click', function () {
+                    // Remove active from all
+                    thumbnails.forEach(t => t.classList.remove('active'));
+                    mainImages.forEach(img => img.classList.remove('active'));
+
+                    // Add active to clicked target
+                    this.classList.add('active');
+                    const targetIndex = this.getAttribute('data-target');
+                    document.getElementById(`main-product-img-${targetIndex}`).classList.add('active');
+                });
+            });
+        }
+
+        // Image Magnifier Effect
+        const container = document.querySelector('.detail-slider-container');
+        if (container) {
+            container.addEventListener('mousemove', function (e) {
+                const activeImg = this.querySelector('.detail-slider-image.active');
+                if (!activeImg) return;
+
+                const { left, top, width, height } = this.getBoundingClientRect();
+                const x = ((e.clientX - left) / width) * 100;
+                const y = ((e.clientY - top) / height) * 100;
+
+                activeImg.style.transformOrigin = `${x}% ${y}%`;
+                activeImg.style.transform = 'scale(2)'; // Magnification level
+            });
+
+            container.addEventListener('mouseleave', function () {
+                const activeImg = this.querySelector('.detail-slider-image.active');
+                if (!activeImg) return;
+
+                activeImg.style.transformOrigin = 'center';
+                activeImg.style.transform = 'scale(1)';
+            });
+        }
+    });
+</script>
+{% endblock %}

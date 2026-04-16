@@ -1,0 +1,119 @@
+{% extends 'layouts/base.html' %}
+{% load currency_tags %}
+
+{% block title %}Our Gallery | Seth Sanwara Jewellers{% endblock %}
+
+{% block content %}
+<div class="container section-padding" style="margin-top: 60px;">
+    <h1 class="section-title">Exquisite Collections</h1>
+
+    <!-- Filter Bar -->
+    <form method="GET" action="{% url 'gallery' %}" class="filter-form">
+        <!-- Category Filter -->
+        <div class="category-filter">
+            <input type="radio" name="category" value="" id="cat-all" {% if not selected_category %}checked{% endif %}
+                style="display:none;" onchange="this.form.submit()">
+            <label for="cat-all" class="filter-btn {% if not selected_category %}active{% endif %}">All</label>
+
+            {% for category in categories %}
+            {% if selected_category == category.slug %}
+            <input type="radio" name="category" value="{{ category.slug }}" id="cat-{{ category.slug }}" checked
+                style="display:none;" onchange="this.form.submit()">
+            <label for="cat-{{ category.slug }}" class="filter-btn active">{{ category.name }}</label>
+            {% else %}
+            <input type="radio" name="category" value="{{ category.slug }}" id="cat-{{ category.slug }}"
+                style="display:none;" onchange="this.form.submit()">
+            <label for="cat-{{ category.slug }}" class="filter-btn">{{ category.name }}</label>
+            {% endif %}
+            {% endfor %}
+        </div>
+
+        <div class="price-filter"
+            style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-top: 15px; flex-wrap: wrap;">
+            <div class="product-filter-controls" style="font-weight: 500; color: var(--secondary-color);">
+                <span>Price (Max): </span>
+                <span id="price-display" style="font-weight: bold; color: var(--primary-color);">
+                    ₹<span>{{ current_max_price|indian_rupee }}</span>
+                </span>
+            </div>
+
+            <input type="range" name="max_price" min="{{ lowest_price }}" max="{{ highest_price }}" step="1000"
+                value="{{ current_max_price }}" class="form-range" style="width: 250px; cursor: pointer;"
+                oninput="document.getElementById('price-display').innerText = '₹' + Number(this.value).toLocaleString('en-IN');">
+
+            <button type="submit" class="btn btn-primary" style="padding: 0.5rem 1.2rem;">Apply</button>
+        </div>
+    </form>
+
+    <!-- Gallery Grid -->
+    <div class="product-grid">
+        {% for product in products %}
+        <div class="product-card">
+            <div class="product-img-wrap">
+                <a href="{% url 'product_detail' product.id %}" style="display: block; width: 100%; height: 100%;">
+                    {% if product.images.all %}
+                    {% if product.images.count > 1 %}
+                    <div class="slider-container">
+                        {% for img in product.images.all %}
+                        <img src="{{ img.image.url }}" alt="{{ product.title }}"
+                            class="slider-image {% if forloop.first %}active{% endif %}">
+                        {% endfor %}
+                        <button class="slider-btn prev"><i class="fas fa-chevron-left"></i></button>
+                        <button class="slider-btn next"><i class="fas fa-chevron-right"></i></button>
+                        <div class="slider-indicators">
+                            {% for img in product.images.all %}
+                            <div class="indicator {% if forloop.first %}active{% endif %}"></div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% else %}
+                    <img src="{{ product.images.first.image.url }}" alt="{{ product.title }}">
+                    {% endif %}
+                    {% else %}
+                    <img src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+                        alt="Placeholder">
+                    {% endif %}
+                </a>
+            </div>
+
+            <div class="product-info">
+                <h3 class="product-title">
+                    <a href="{% url 'product_detail' product.id %}" style="text-decoration: none; color: inherit;">
+                        {{ product.title }}
+                    </a>
+                </h3>
+
+                <div class="product-attributes" style="margin-bottom: 10px;">
+                    {% if product.carat %}
+                    <span class="badge badge-gold"
+                        style="background: rgba(212, 175, 55, 0.15); color: #b08d20; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; margin-right: 5px;">
+                        {{ product.carat }}
+                    </span>
+                    {% endif %}
+                    {% if product.weight_grams %}
+                    <span class="badge badge-weight"
+                        style="background: #f0f0f0; color: #555; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold;">
+                        {{ product.weight_grams }}g
+                    </span>
+                    {% endif %}
+                </div>
+
+                <p class="product-price">₹{{ product.price|indian_rupee }}</p>
+                <div style="margin-top: 15px;">
+                    <a href="https://wa.me/918871013023?text=Hello%20Seth%20Sanwara%20Jewellers,%20I%20am%20interested%20in%20the%20*{{ product.title }}*.%0A%0AHere%20is%20the%20link%20to%20the%20product:%20{{ request.scheme }}://{{ request.get_host }}{% url 'product_detail' product.id %}"
+                        style="padding: 8px 16px; font-size: 0.9rem; position: relative; z-index: 10;">
+                        <i class="fab fa-whatsapp"></i> Inquire
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div style="grid-column: 1/-1; text-align: center; padding: 3rem;">
+            <h3>No products found in this category.</h3>
+            <p>Please check back later or explore other collections.</p>
+            <a href="{% url 'gallery' %}" class="btn btn-primary" style="margin-top: 1rem;">View All</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

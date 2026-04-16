@@ -1,0 +1,107 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="hero-content">
+        <h1>Timeless Elegance</h1>
+        <p>Discover our exclusive high-end jewelry collection crafted for your most precious moments.</p>
+        <a href="{% url 'gallery' %}" class="btn btn-primary">Explore Collection</a>
+    </div>
+</section>
+
+<!-- Featured Products -->
+<section class="section-padding bg-light">
+    <div class="container">
+        <h2 class="section-title">Our Signature Pieces</h2>
+
+        <div class="product-grid">
+            {% for product in featured_products %}
+            <div class="product-card">
+                <a href="{% url 'product_detail' product.id %}"
+                    style="text-decoration: none; color: inherit; display: block; height: 100%;">
+                    <div class="product-img-wrap">
+                        {% if product.images.all %}
+                        {% if product.images.count > 1 %}
+                        <div class="slider-container">
+                            {% for img in product.images.all %}
+                            <img src="{{ img.image.url }}" alt="{{ product.title }}"
+                                class="slider-image {% if forloop.first %}active{% endif %}">
+                            {% endfor %}
+                            <button class="slider-btn prev"><i class="fas fa-chevron-left"></i></button>
+                            <button class="slider-btn next"><i class="fas fa-chevron-right"></i></button>
+                            <div class="slider-indicators">
+                                {% for img in product.images.all %}
+                                <div class="indicator {% if forloop.first %}active{% endif %}"></div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% else %}
+                        <img src="{{ product.images.first.image.url }}" alt="{{ product.title }}">
+                        {% endif %}
+                        {% else %}
+                        <img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+                            alt="{{ product.title }}">
+                        {% endif %}
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-title">{{ product.title }}</h3>
+
+                        <div class="product-attributes" style="margin-bottom: 10px;">
+                            {% if product.carat %}
+                            <span class="badge badge-gold"
+                                style="background: rgba(212, 175, 55, 0.15); color: #b08d20; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; margin-right: 5px;">
+                                {{ product.carat }}
+                            </span>
+                            {% endif %}
+                            {% if product.weight_grams %}
+                            <span class="badge badge-weight"
+                                style="background: #f0f0f0; color: #555; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold;">
+                                {{ product.weight_grams }}g
+                            </span>
+                            {% endif %}
+                        </div>
+                        {% load currency_tags %}
+                        <p class="product-price">₹{{ product.price|indian_rupee }}</p>
+                    </div>
+                </a>
+            </div>
+            {% empty %}
+            <p class="text-center" style="grid-column: 1/-1;">Check back soon for our newest arrivals.</p>
+            {% endfor %}
+        </div>
+
+        <div style="text-align: center; margin-top: 3rem;">
+            <a href="{% url 'gallery' %}" class="btn btn-outline">View All Products</a>
+        </div>
+    </div>
+</section>
+
+<!-- Why Choose Us -->
+<section class="section-padding">
+    <div class="container">
+        <h2 class="section-title">Why Seth Sanwara?</h2>
+        <div
+            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; text-align: center;">
+            <div style="padding: 2rem; background: #fff; border-radius: 8px; box-shadow: var(--shadow-sm);">
+                <i class="fas fa-gem" style="font-size: 3rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
+                <h3 style="margin-bottom: 0.5rem; font-size: 1.3rem;">Unmatched Quality</h3>
+                <p>Meticulously sourced materials ensuring absolute perfection.</p>
+            </div>
+            <div style="padding: 2rem; background: #fff; border-radius: 8px; box-shadow: var(--shadow-sm);">
+                <i class="fas fa-certificate"
+                    style="font-size: 3rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
+                <h3 style="margin-bottom: 0.5rem; font-size: 1.3rem;">Certified Authentic</h3>
+                <p>100% hallmark certified pure gold, silver, and diamonds.</p>
+            </div>
+            <div style="padding: 2rem; background: #fff; border-radius: 8px; box-shadow: var(--shadow-sm);">
+                <i class="fas fa-hand-holding-heart"
+                    style="font-size: 3rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
+                <h3 style="margin-bottom: 0.5rem; font-size: 1.3rem;">Legacy of Trust</h3>
+                <p>Serving Singrauli for generations with uncompromised ethics.</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
